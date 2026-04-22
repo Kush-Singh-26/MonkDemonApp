@@ -1,0 +1,15 @@
+.log
+node_modules/
+android/.gradle
+android/local.properties
+android/**/build/
+android/**/captures/
+android/app/build/
+www/assets/
+*.keystore
+*.jks
+*.iml
+.DS_Store
+dist/
+npm-debug.log*
+yarn-error.log*

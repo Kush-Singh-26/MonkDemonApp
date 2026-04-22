@@ -1,0 +1,19 @@
+{
+  "name": "monk-demon-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Monk & Demon — River Crossing wrapped for Android via Capacitor",
+  "scripts": {
+    "cap:copy": "npx cap copy",
+    "cap:sync": "npx cap sync",
+    "cap:open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1"
+  },
+  "devDependencies": {
+    "pngjs": "^7.0.0"
+  }
+}

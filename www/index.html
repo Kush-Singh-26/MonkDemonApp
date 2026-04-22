@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Monk & Demon — River Crossing</title>
+<!-- Local font faces (place fonts/*.woff2 here) -->
+<style>
+@font-face {
+  font-family: 'Cinzel';
+  src: url('./fonts/Cinzel.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Cinzel Decorative';
+  src: url('./fonts/CinzelDecorative.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IM Fell English';
+  src: url('./fonts/IMFellEnglish.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Courier Prime';
+  src: url('./fonts/CourierPrime.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+</style>
+<style>
+:root{
+  --ink:#080610;--parchment:#f0e8d0;--parchment-dark:#d4c89a;
+  --indigo:#1a1240;--indigo-mid:#2d1f5e;
+  --vermillion:#c0392b;--vermillion-bright:#e74c3c;
+  --gold:#c9a84c;--gold-light:#f0c060;
+  --glow-gold:0 0 16px rgba(201,168,76,0.45);
+  --glow-red:0 0 16px rgba(192,57,43,0.5);
+}
+*{margin:0;padding:0;box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+/* Prevent text selection and pull-to-refresh on Android */
+html,body{ -webkit-user-select:none; user-select:none; overscroll-behavior-y:contain; }
+button { touch-action: manipulation; }
+body{background:var(--ink);color:var(--parchment);font-family:'IM Fell English',serif;min-height:100vh;overflow-x:hidden;}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:0.4;
+}
+
+/* HEADER */
+header{text-align:center;padding:12px 15px 0;position:relative;}
+header::after{content:'';display:block;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin-top:10px;}
+.title-main{font-family:'Cinzel Decorative',serif;font-weight:700;font-size:clamp(1.4rem,5vw,2.3rem);color:var(--gold-light);text-shadow:0 0 40px rgba(201,168,76,0.5),0 2px 4px rgba(0,0,0,0.9);letter-spacing:0.06em;}
+.title-sub{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(0.7rem,2vw,0.88rem);color:var(--parchment-dark);margin-top:3px;letter-spacing:0.15em;opacity:0.75;}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:1fr 300px; gap:12px; padding:12px; max-width:1100px; margin:0 auto;}
+@media(max-width:860px){.app{grid-template-columns:1fr; display:flex; flex-direction:column;}}
+
+/* PANELS */
+.panel{background:linear-gradient(150deg,#0e0b1c,#160e2e);border:1px solid rgba(201,168,76,0.2);border-radius:4px;position:relative;overflow:hidden;}
+.panel::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 12% 12%,rgba(201,168,76,0.05),transparent 55%);} 
+.ptitle{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase;padding:8px 12px;border-bottom:1px solid rgba(201,168,76,0.1);display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.2);}
+
+/* SCENE */
+.scene-panel{display:flex; flex-direction:column;}
+#sc{display:block;width:100%;height:320px; object-fit:cover;}
+@media(max-width:600px){ #sc{height: 230px;} }
+
+/* CONTROLS */
+.mgrid{padding:10px; display:flex; flex-wrap:wrap; gap:6px; justify-content:center;}
+.mbtn{flex:1 1 30%; min-width:70px; min-height:50px; background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.16);border-radius:4px;color:var(--parchment);font-family:'Cinzel',serif;cursor:pointer;transition:all 0.12s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.mbtn:hover:not(:disabled), .mbtn:active:not(:disabled){background:rgba(201,168,76,0.14);border-color:var(--gold);color:var(--gold-light);box-shadow:var(--glow-gold);}
+.mbtn:disabled{opacity:0.2;cursor:not-allowed;}
+.mbtn .mi{font-size:16px;}.mbtn .ml{font-size:0.5rem;letter-spacing:0.04em;}.mbtn .md{font-size:0.55rem;opacity:0.45;}
+
+.cbar, .arow, .srow{padding:10px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; border-top:1px solid rgba(201,168,76,0.08);}
+.cbtn{flex:1 1 auto; min-height:36px; background:transparent;border:1px solid rgba(201,168,76,0.25);color:var(--gold);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;padding:5px 12px;border-radius:3px;cursor:pointer;transition:all 0.12s;text-transform:uppercase; text-align:center;}
+.cbtn:hover:not(:disabled), .cbtn:active:not(:disabled){background:rgba(201,168,76,0.1);border-color:var(--gold-light);box-shadow:var(--glow-gold);}
+.cbtn:disabled{opacity:0.22;cursor:not-allowed;}
+.cbtn.danger{border-color:rgba(192,57,43,0.32);color:var(--vermillion-bright);}
+.cbtn.active{background:rgba(201,168,76,0.15);border-color:var(--gold-light);color:var(--gold-light);}
+
+.albl, .slbl{font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.12em;color:var(--gold);opacity:0.6;text-transform:uppercase;}
+.abtn{background:transparent;border:1px solid rgba(201,168,76,0.17);color:var(--parchment-dark);font-family:'Courier Prime',monospace;font-size:0.65rem;padding:6px 10px;border-radius:3px;cursor:pointer;}
+.abtn.sel{background:rgba(201,168,76,0.15);border-color:var(--gold);color:var(--gold-light);}
+
+input[type=range]{-webkit-appearance:none;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--gold) 0%,rgba(201,168,76,0.14) 100%);outline:none;flex:1;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 0 5px rgba(201,168,76,0.5);} 
+
+/* SIDEBAR & STATE */
+.sidebar{display:flex;flex-direction:column;gap:12px;}
+.sdisp{padding:12px;display:flex;flex-direction:column;gap:8px;}
+.blbl{font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.18em;color:var(--gold);opacity:0.62;text-transform:uppercase;}
+.bfigs{display:flex;gap:4px;flex-wrap:wrap;min-height:36px;align-items:center;}
+.fig{width:28px;height:34px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.fig.demon{filter:drop-shadow(0 0 4px rgba(192,57,43,0.6));}
+.div{height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.16),transparent);} 
+.bind{display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12);border-radius:4px;font-size:0.75rem;color:var(--parchment-dark);justify-content:center;}
+.bdot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 5px var(--gold);flex-shrink:0;transition:all 0.4s;}
+.bdot.r{background:var(--vermillion);box-shadow:0 0 5px var(--vermillion);} 
+.crow{display:flex;justify-content:space-around;padding:10px 5px;border-top:1px solid rgba(201,168,76,0.08);} 
+.ctr{display:flex;flex-direction:column;align-items:center;gap:2px;} .cval{font-family:'Cinzel',serif;font-size:1.2rem;color:var(--gold);line-height:1;} .clbl{font-size:0.5rem;letter-spacing:0.12em;color:var(--parchment-dark);opacity:0.5;text-transform:uppercase;} 
+.smsg{padding:8px 12px 12px;text-align:center;} .smsgT{font-family:'IM Fell English',serif;font-style:italic;font-size:0.85rem;color:var(--parchment-dark);min-height:1.2em;} .smsgT.win{color:var(--gold-light);font-size:0.95rem; text-shadow:var(--glow-gold);} 
+
+/* TREE VIEW */
+.treepanel{flex:1;display:flex;flex-direction:column;min-height:280px;} .treewrap{flex:1;position:relative;overflow:auto;background:rgba(0,0,0,0.2); touch-action: pan-x pan-y;} #tc{display:block; min-width:100%; min-height:100%;} .legend{display:flex; gap:10px; padding:5px 12px; background:rgba(0,0,0,0.3); font-family:'Courier Prime',monospace; font-size:0.55rem; color:var(--parchment-dark); justify-content:center; border-bottom:1px solid rgba(201,168,76,0.1);} .ldot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;} 
+
+/* TOAST */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--indigo-mid);border:1px solid var(--gold);color:var(--gold-light);font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.1em;padding:10px 24px;border-radius:4px;transition:transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);z-index:10000;box-shadow:var(--glow-gold);pointer-events:none;text-align:center;width:max-content;max-width:90vw;} .toast.show{transform:translateX(-50%) translateY(0);} ::-webkit-scrollbar{width:6px; height:6px;}::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.3);border-radius:3px;} 
+</style>
+</head>
+<body>
+<header>
+  <div class="title-main">Monk &amp; Demon</div>
+  <div class="title-sub">The River Crossing</div>
+</header>
+<div class="app">
+
+  <!-- LEFT COLUMN -->
+  <div style="display:flex; flex-direction:column; gap:12px;">
+    <!-- SCENE -->
+    <div class="panel scene-panel">
+      <div class="ptitle">
+        <svg width="12" height="12" viewBox="0 0 11 11" fill="none"><path d="M1 9Q5.5 5 10 9" stroke="var(--gold)" stroke-width="1.4"/><path d="M0 9.5L11 9.5" stroke="var(--gold)" stroke-width="0.8"/></svg>
+        THE CROSSING
+      </div>
+      <canvas id="sc"></canvas>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="panel controls-panel">
+      <div class="ptitle">
+        <svg width="12" height="12" viewBox="0 0 11 11"><rect x="1" y="1" width="9" height="9" rx="1" stroke="var(--gold)" stroke-width="0.9" fill="none"/><path d="M3.5 5.5h4M5.5 3.5v4" stroke="var(--gold)" stroke-width="0.9"/></svg>
+        CHOOSE YOUR MOVE
+      </div>
+      <div class="mgrid" id="mgrid"></div>
+      
+      <div class="cbar">
+        <button class="cbtn" id="undoBtn" onclick="doUndo()">↩ Undo</button>
+        <button class="cbtn" id="redoBtn" onclick="doRedo()">↪ Redo</button>
+        <button class="cbtn danger" onclick="resetGame(false)">⊘ Reset</button>
+      </div>
+      <div class="arow">
+        <span class="albl">Solver:</span>
+        <button class="abtn sel" data-a="bfs" onclick="pickAlgo('bfs')">BFS</button>
+        <button class="abtn" data-a="astar" onclick="pickAlgo('astar')">A*</button>
+        <button class="abtn" data-a="dfs" onclick="pickAlgo('dfs')">DFS</button>
+        <div style="flex:1"></div>
+        <button class="cbtn" onclick="solveAndPlay()" style="border-color:var(--gold-light);">Solve &amp; Play</button>
+      </div>
+      <div class="srow">
+        <button class="cbtn" id="autoBtn" onclick="toggleAuto()" style="margin-right:10px;">▶ Auto Play</button>
+        <span class="slbl">Speed</span>
+        <input type="range" id="spd" min="1" max="5" value="3" oninput="setSpeed(+this.value)">
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN / SIDEBAR -->
+  <div class="sidebar">
+    <div class="panel">
+      <div class="ptitle">
+        <svg width="12" height="12" viewBox="0 0 11 11"><circle cx="5.5" cy="5.5" r="4.5" stroke="var(--gold)" stroke-width="0.9" fill="none"/><path d="M5.5 3v2.5l1.8 1.8" stroke="var(--gold)" stroke-width="0.9" stroke-linecap="round"/></svg>
+        CURRENT STATE
+      </div>
+      <div class="sdisp">
+        <div><div class="blbl">Left Bank</div><div class="bfigs" id="lfigs"></div></div>
+        <div class="div"></div>
+        <div>
+          <div class="bind"><div class="bdot" id="bdot"></div><span id="btxt">Boat at left</span></div>
+        </div>
+        <div class="div"></div>
+        <div><div class="blbl">Right Bank</div><div class="bfigs" id="rfigs"></div></div>
+        <div class="crow">
+          <div class="ctr"><div class="cval" id="mcnt">0</div><div class="clbl">Moves</div></div>
+          <div class="ctr"><div class="cval" id="ucnt">0</div><div class="clbl">Undos</div></div>
+          <div class="ctr"><div class="cval" id="ocnt">—</div><div class="clbl">Optimal</div></div>
+        </div>
+      </div>
+      <div class="smsg"><div class="smsgT" id="smsg">Transport all across.</div></div>
+    </div>
+
+    <!-- SEARCH TREE -->
+    <div class="panel treepanel">
+      <div class="ptitle">
+        <svg width="12" height="12" viewBox="0 0 11 11"><circle cx="5.5" cy="2" r="1.3" stroke="var(--gold)" stroke-width="0.8" fill="none"/><circle cx="2" cy="8.5" r="1.3" stroke="var(--gold)" stroke-width="0.8" fill="none"/><circle cx="9" cy="8.5" r="1.3" stroke="var(--gold)" stroke-width="0.8" fill="none"/><line x1="5.5" y1="3.3" x2="2" y2="7.2" stroke="var(--gold)" stroke-width="0.7"/><line x1="5.5" y1="3.3" x2="9" y2="7.2" stroke="var(--gold)" stroke-width="0.7"/></svg>
+        SEARCH TREE — <span id="algoLbl" style="color:var(--parchment-dark);margin-left:3px">BFS</span>
+      </div>
+      <div class="legend">
+        <span><i class="ldot" style="background:#e74c3c; box-shadow:0 0 4px #e74c3c;"></i>Current</span>
+        <span><i class="ldot" style="background:#f0c060;"></i>Path</span>
+        <span><i class="ldot" style="background:#c9a84c;"></i>Goal</span>
+        <span><i class="ldot" style="background:rgba(255,255,255,0.3);"></i>Searched</span>
+      </div>
+      <div class="treewrap" id="tw">
+        <canvas id="tc"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+// ════════════════════════════════════════════════
+// PUZZLE ENGINE
+// ════════════════════════════════════════════════
+const N=3, CAP=2;
+const mk=(lm,ld,rm,rd,b)=>({lm,ld,rm,rd,b});
+const skey=s=>`${s.lm}${s.ld}${s.rm}${s.rd}${s.b}`;
+const isGoal=s=>s.lm===0&&s.ld===0;
+
+function valid(s){
+  if(s.lm<0||s.ld<0||s.rm<0||s.rd<0) return false;
+  if(s.lm+s.rm!==N||s.ld+s.rd!==N)   return false;
+  if(s.lm>0&&s.ld>s.lm) return false;
+  if(s.rm>0&&s.rd>s.rm) return false;
+  return true;
+}
+
+function moves(s){
+  const out=[];
+  for(let m=0;m<=2;m++) for(let d=0;d<=2;d++){
+    if(m+d<1||m+d>CAP) continue;
+    let ns;
+    if(s.b===0){if(m>s.lm||d>s.ld) continue; ns=mk(s.lm-m,s.ld-d,s.rm+m,s.rd+d,1);} 
+    else        {if(m>s.rm||d>s.rd) continue; ns=mk(s.lm+m,s.ld+d,s.rm-m,s.rd-d,0);}
+    if(valid(ns)) out.push({m,d,ns});
+  }
+  return out;
+}
+
+// ── Solvers
+function mkTree(){return {nodes:[],edges:[],sol:null};}
+function _addNode(tree,state,pid,depth){
+  const id=tree.nodes.length;
+  tree.nodes.push({state,id,pid,depth});
+  if(pid!==null) tree.edges.push({f:pid,t:id});
+  return id;
+}
+
+function bfs(start){
+  const T=mkTree();
+  const root=_addNode(T,start,null,0);
+  const Q=[{s:start,pid:root,d:0,path:[start]}];
+  const seen=new Map([[skey(start),root]]);
+  while(Q.length){
+    const {s,pid,d,path}=Q.shift();
+    for(const mv of moves(s)){
+      const k=skey(mv.ns);
+      const nid=_addNode(T,mv.ns,pid,d+1);
+      if(!seen.has(k)){
+        seen.set(k,nid);
+        const np=[...path,mv.ns];
+        if(isGoal(mv.ns)){T.sol=np;return T;}
+        Q.push({s:mv.ns,pid:nid,d:d+1,path:np});
+      }
+    }
+  }
+  return T;
+}
+
+function dfs(start){
+  const T=mkTree();
+  const root=_addNode(T,start,null,0);
+  const stack=[{s:start,pid:root,d:0,path:[start]}];
+  const seen=new Set([skey(start)]);
+  while(stack.length){
+    const {s,pid,d,path}=stack.pop();
+    for(const mv of moves(s)){
+      const k=skey(mv.ns);
+      const nid=_addNode(T,mv.ns,pid,d+1);
+      if(!seen.has(k)){
+        seen.add(k);
+        const np=[...path,mv.ns];
+        if(isGoal(mv.ns)){T.sol=np;return T;}
+        stack.push({s:mv.ns,pid:nid,d:d+1,path:np});
+      }
+    }
+  }
+  return T;
+}
+
+function astar(start){
+  const h=s=>Math.ceil((s.lm+s.ld)/CAP);
+  const T=mkTree();
+  const root=_addNode(T,start,null,0);
+  const open=[{s:start,pid:root,g:0,f:h(start),path:[start]}];
+  const seen=new Set([skey(start)]);
+  while(open.length){
+    open.sort((a,b)=>a.f-b.f);
+    const {s,pid,g,path}=open.shift();
+    for(const mv of moves(s)){
+      const k=skey(mv.ns);
+      const ng=g+1;
+      const nid=_addNode(T,mv.ns,pid,path.length);
+      if(!seen.has(k)){
+        seen.add(k);
+        const np=[...path,mv.ns];
+        if(isGoal(mv.ns)){T.sol=np;return T;}
+        open.push({s:mv.ns,pid:nid,g:ng,f:ng+h(mv.ns),path:np});
+      }
+    }
+  }
+  return T;
+}
+
+// ════════════════════════════════════════════════
+// GAME STATE
+// ════════════════════════════════════════════════
+let gState  = mk(N,N,0,0,0);
+let gHist   = [gState];
+let gFuture = [];
+let gMoves  = 0;
+let gUndos  = 0;
+let gTree   = null;
+let gTreeLayout = null; // Cache for tree drawing
+let gSol    = null;  
+let algo    = 'bfs';
+
+let playing = false;
+let isAnimating = false;
+let playTimer=null;
+let playQ   = [];
+
+let speed   = 3; // Default
+const spMs  = v=>[1800, 1100, 650, 350, 180][v-1]; 
+
+let playerKeys = [skey(gState)];
+
+// ════════════════════════════════════════════════
+// SCENE CANVAS
+// ════════════════════════════════════════════════
+const SC=document.getElementById('sc');
+const cx=SC.getContext('2d');
+const RL=0.25, RR=0.75, GF=0.62;
+
+let boatX=0, boatTX=0;
+let waveOff=0;
+let ripples=[];
+let chars=[]; 
+
+function gW(){return SC.width;}
+function gH(){return SC.height;}
+function gy(){return SC.height*GF;}
+
+function initSC(){
+  SC.width=SC.offsetWidth||600;
+  SC.height=SC.offsetHeight||280;
+  
+  if(chars.length === 0){
+    for(let i=0;i<N;i++) chars.push({type:'monk', bank:0, onboat:false, x:0, y:0, tx:0, ty:0});
+    for(let i=0;i<N;i++) chars.push({type:'demon', bank:0, onboat:false, x:0, y:0, tx:0, ty:0});
+  }
+
+  boatTX = gState.b===0 ? gW()*RL+20 : gW()*RR-20;
+  if(boatX === 0) {
+    boatX = boatTX;
+    updateCharTargets();
+    chars.forEach(c => { c.x=c.tx; c.y=c.ty; });
+  }
+}
+
+function getSlotPos(bank, type, idx) {
+  const w = gW(), y0 = gy();
+  const xSpc = w > 500 ? 28 : 22;
+  if (bank === 0) {
+    return { tx: w * 0.03 + idx * xSpc, ty: type === 'monk' ? y0 - 15 : y0 - 34 };
+  } else {
+    return { tx: w * RR + 10 + idx * xSpc, ty: type === 'monk' ? y0 - 15 : y0 - 34 };
+  }
+}
+
+function getBoatSlotPos(bx, idx, total) {
+  return { tx: bx + (idx - (total - 1) / 2) * 18, ty: gy() + 4 };
+}
+
+function updateCharTargets() {
+  let lM = 0, lD = 0, rM = 0, rD = 0, bS = 0;
+  const passengers = chars.filter(c => c.onboat);
+  
+  chars.forEach(c => {
+    if (c.onboat) {
+      const pos = getBoatSlotPos(boatX, bS++, passengers.length);
+      c.tx = pos.tx; c.ty = pos.ty;
+    } else {
+      let pos;
+      if (c.bank === 0) {
+        if (c.type === 'monk') pos = getSlotPos(0, 'monk', lM++);
+        else pos = getSlotPos(0, 'demon', lD++);
+      } else {
+        if (c.type === 'monk') pos = getSlotPos(1, 'monk', rM++);
+        else pos = getSlotPos(1, 'demon', rD++);
+      }
+      c.tx = pos.tx; c.ty = pos.ty;
+    }
+  });
+}
+
+let animTs=0;
+function frame(ts){
+  if(!animTs) animTs=ts;
+  const dt=Math.min(ts-animTs,50); animTs=ts;
+  waveOff=(waveOff+dt*0.012)%80;
+  drawFrame(ts);
+  requestAnimationFrame(frame);
+}
+
+function drawFrame(ts){
+  const w=gW(), h=gH(), g=gy();
+  cx.clearRect(0,0,w,h);
+
+  const sk=cx.createLinearGradient(0,0,0,g);
+  sk.addColorStop(0,'#060410'); sk.addColorStop(1,'#16103a');
+  cx.fillStyle=sk; cx.fillRect(0,0,w,g);
+
+  for(let i=0;i<40;i++){
+    const sx=(Math.sin(i*71.3)*0.5+0.5)*w, sy=(Math.cos(i*43.7)*0.5+0.5)*g*0.9;
+    const b=Math.sin(ts*0.001+i)*0.3+0.7;
+    cx.globalAlpha=b*0.55; cx.fillStyle='#f0e8d0'; cx.fillRect(sx,sy,1.5,1.5);
+  }
+  cx.globalAlpha=1;
+
+  cx.save();
+  cx.shadowBlur=40; cx.shadowColor='rgba(240,200,100,0.25)';
+  cx.beginPath(); cx.arc(w*0.85,h*0.15,h*0.07,0,Math.PI*2);
+  const mg=cx.createRadialGradient(w*0.85,h*0.15,0,w*0.85,h*0.15,h*0.07);
+  mg.addColorStop(0,'#f5e8b0'); mg.addColorStop(1,'#c9a84c');
+  cx.fillStyle=mg; cx.fill(); cx.restore();
+
+  const gd=cx.createLinearGradient(0,g,0,h);
+  gd.addColorStop(0,'#281908'); gd.addColorStop(1,'#160c03');
+  cx.fillStyle=gd;
+  cx.fillRect(0,g,w*RL,h-g);
+  cx.fillRect(w*RR,g,w*(1-RR),h-g);
+
+  cx.strokeStyle='rgba(201,168,76,0.18)'; cx.lineWidth=1.4;
+  cx.beginPath(); cx.moveTo(w*RL,g); cx.lineTo(w*RL,h); cx.stroke();
+  cx.beginPath(); cx.moveTo(w*RR,g); cx.lineTo(w*RR,h); cx.stroke();
+
+  const rv=cx.createLinearGradient(w*RL,0,w*RR,0);
+  rv.addColorStop(0,'#0b1e38'); rv.addColorStop(0.5,'#193355'); rv.addColorStop(1,'#0b1e38');
+  cx.fillStyle=rv; cx.fillRect(w*RL,g,w*(RR-RL),h-g);
+
+  cx.strokeStyle='rgba(38,88,140,0.38)'; cx.lineWidth=1;
+  for(let row=0;row<5;row++){
+    const ry=g+8+row*16;
+    for(let xi=-1;xi<15;xi++){
+      const rx=w*RL+((xi*45+waveOff*1.8)%(w*(RR-RL)+45));
+      if(rx<w*RL||rx>w*RR) continue;
+      cx.beginPath(); cx.ellipse(rx,ry,11,3,0,0,Math.PI); cx.stroke();
+    }
+  }
+
+  ripples=ripples.filter(r=>r.a>0.02);
+  ripples.forEach(r=>{
+    r.r+=0.8; r.a-=0.02; 
+    cx.beginPath(); cx.arc(r.x,r.y,r.r,0,Math.PI*2);
+    cx.strokeStyle=`rgba(48,108,180,${r.a})`; cx.lineWidth=1.5; cx.stroke();
+  });
+
+  drawTrees(w,h,g);
+
+  const bLerp = [0.05, 0.1, 0.18, 0.35, 0.65][speed-1];
+  boatX += (boatTX - boatX) * bLerp;
+  const bw = Math.sin(ts*0.0018)*2;
+  drawBoat(boatX, g+12+bw);
+
+  updateCharTargets();
+  const cLerp = [0.1, 0.18, 0.3, 0.45, 0.8][speed-1];
+  
+  chars.forEach(c => {
+    c.x += (c.tx - c.x) * cLerp;
+    c.y += (c.ty - c.y) * cLerp;
+  });
+  
+  [...chars].sort((a,b) => a.y - b.y).forEach(c => {
+    drawChar(c.type, c.x, c.y);
+  });
+}
+
+function drawBoat(x,y){
+  cx.save(); cx.translate(x,y);
+  cx.shadowBlur=10; cx.shadowColor='rgba(0,0,0,0.6)';
+  cx.beginPath();
+  cx.moveTo(-38,0); cx.quadraticCurveTo(-42,18,-28,22); cx.lineTo(28,22); cx.quadraticCurveTo(42,18,38,0); cx.closePath();
+  const h2=cx.createLinearGradient(0,-2,0,22);
+  h2.addColorStop(0,'#5e4020'); h2.addColorStop(1,'#3a2510');
+  cx.fillStyle=h2; cx.fill();
+  cx.strokeStyle='rgba(201,168,76,0.3)'; cx.lineWidth=1.5; cx.stroke();
+  cx.strokeStyle='rgba(0,0,0,0.2)'; cx.lineWidth=0.8;
+  for(const px of[-20,-8,4,16,28]){cx.beginPath();cx.moveTo(px,0);cx.lineTo(px,20);cx.stroke();}
+  cx.beginPath(); cx.moveTo(-38,0); cx.lineTo(38,0);
+  cx.strokeStyle='rgba(201,168,76,0.25)'; cx.lineWidth=1.5; cx.stroke();
+  cx.shadowBlur=0; cx.restore();
+}
+
+function drawChar(type,x,y){
+  cx.save(); cx.translate(x,y);
+  const sc = 0.9; cx.scale(sc,sc);
+  if(type==='monk'){
+    cx.beginPath(); cx.ellipse(0,5,7,11,0,0,Math.PI*2);
+    cx.fillStyle='#c8bfa0'; cx.fill();
+    cx.strokeStyle='rgba(200,168,76,0.22)'; cx.lineWidth=0.7; cx.stroke();
+    cx.beginPath(); cx.arc(0,-10,5.5,0,Math.PI*2);
+    cx.fillStyle='#d4a070'; cx.fill();
+    cx.beginPath(); cx.arc(0,-17,5,0,Math.PI*2);
+    cx.strokeStyle='rgba(201,168,76,0.5)'; cx.lineWidth=1.2;
+    cx.shadowBlur=6; cx.shadowColor='rgba(201,168,76,0.4)'; cx.stroke(); cx.shadowBlur=0;
+  } else {
+    cx.beginPath(); cx.ellipse(0,5,8,12,0,0,Math.PI*2);
+    cx.fillStyle='#8b1a1a'; cx.fill();
+    cx.shadowBlur=8; cx.shadowColor='rgba(192,40,40,0.4)';
+    cx.strokeStyle='rgba(220,50,50,0.3)'; cx.lineWidth=0.7; cx.stroke(); cx.shadowBlur=0;
+    cx.beginPath(); cx.arc(0,-10,6,0,Math.PI*2);
+    cx.fillStyle='#a02020'; cx.fill();
+    cx.strokeStyle='#c0392b'; cx.lineWidth=2.2; cx.lineCap='round';
+    cx.beginPath(); cx.moveTo(-3,-15); cx.lineTo(-5,-24); cx.stroke();
+    cx.beginPath(); cx.moveTo(3,-15); cx.lineTo(5,-24); cx.stroke();
+    cx.fillStyle='#ff7070';
+    cx.beginPath(); cx.arc(-2,-10,1.5,0,Math.PI*2); cx.fill();
+    cx.beginPath(); cx.arc(2,-10,1.5,0,Math.PI*2); cx.fill();
+  }
+  cx.restore();
+}
+
+function drawTrees(w,h,g){
+  [{x:w*0.06,th:g*0.4},{x:w*0.18,th:g*0.28},{x:w*0.82,th:g*0.35},{x:w*0.94,th:g*0.42}].forEach(t=>{
+    cx.save(); cx.translate(t.x,g);
+    cx.fillStyle='#1a0c04'; cx.fillRect(-1.5,-t.th*0.25,3,t.th*0.25);
+    cx.beginPath(); cx.moveTo(0,-t.th);
+    const lw=t.th;
+    cx.lineTo(-lw*.2,-lw*.4); cx.lineTo(-lw*.12,-lw*.4);
+    cx.lineTo(-lw*.28,-lw*.15); cx.lineTo(-lw*.16,-lw*.15);
+    cx.lineTo(-lw*.35,0); cx.lineTo(lw*.35,0);
+    cx.lineTo(lw*.16,-lw*.15); cx.lineTo(lw*.28,-lw*.15);
+    cx.lineTo(lw*.12,-lw*.4); cx.lineTo(lw*.2,-lw*.4); cx.closePath();
+    const tg=cx.createLinearGradient(0,-t.th,0,0);
+    tg.addColorStop(0,'#0c1d08'); tg.addColorStop(1,'#1c3c12');
+    cx.fillStyle=tg; cx.fill(); cx.restore();
+  });
+}
+
+// ════════════════════════════════════════════════
+// SEARCH TREE LAYOUT & RENDERING
+// ════════════════════════════════════════════════
+const TC=document.getElementById('tc');
+const TW=document.getElementById('tw');
+const tx=TC.getContext('2d');
+
+function generateTreeLayout(tree) {
+  if(!tree || !tree.nodes.length) return null;
+  const adj = {};
+  tree.nodes.forEach(n => adj[n.id] = []);
+  tree.edges.forEach(e => { if(adj[e.f]) adj[e.f].push(e.t); });
+
+  // Recursive pass to get leaf-width of subtrees to prevent overlaps
+  function getW(id) {
+    if(adj[id].length === 0) return 1;
+    let w = 0;
+    for(let c of adj[id]) w += getW(c);
+    return w;
+  }
+
+  const xSpc = 52, ySpc = 38; 
+  let maxD = 0;
+  const pos = {};
+
+  // Recursive pass to assign coordinates
+  function place(id, left, d) {
+    maxD = Math.max(maxD, d);
+    const w = getW(id);
+    pos[id] = { x: left + (w * xSpc)/2, y: d * ySpc + 30 };
+    let curL = left;
+    for(let c of adj[id]) {
+      let cw = getW(c);
+      place(c, curL, d+1);
+      curL += cw * xSpc;
+    }
+  }
+
+  const rootId = tree.nodes[0] ? tree.nodes[0].id : 0;
+  place(rootId, 10, 0);
+
+  const totalW = getW(rootId) * xSpc + 20;
+  const totalH = maxD * ySpc + 60;
+  
+  return { pos, totalW, totalH, rootX: pos[rootId].x };
+}
+
+function updateTreeLayout() {
+  if(!gTree) { gTreeLayout = null; return; }
+  gTreeLayout = generateTreeLayout(gTree);
+  
+  if(gTreeLayout) {
+    // Dynamic resize of canvas inside the scroll wrap (HiDPI-aware)
+    const minW = TW.clientWidth;
+    const minH = TW.clientHeight;
+    const cssW = Math.max(minW, gTreeLayout.totalW);
+    const cssH = Math.max(minH, gTreeLayout.totalH);
+    const ratio = window.devicePixelRatio || 1;
+
+    // Set CSS size so scroll/layout works in CSS pixels
+    TC.style.width = cssW + 'px';
+    TC.style.height = cssH + 'px';
+
+    // Set backing store size for crisp rendering
+    TC.width = Math.max(1, Math.floor(cssW * ratio));
+    TC.height = Math.max(1, Math.floor(cssH * ratio));
+
+    // Normalize drawing operations to CSS pixels
+    tx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    // Center scroll on root initially (CSS pixels)
+    TW.scrollLeft = Math.max(0, gTreeLayout.rootX - minW/2);
+    TW.scrollTop = 0;
+  }
+}
+
+// Helper: rounded rectangle path builder
+function roundRect(ctx, x, y, w, h, r) {
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+  ctx.closePath();
+}
+
+function drawTree(){
+  const ratio = window.devicePixelRatio || 1;
+  const cssW = TC.clientWidth || Math.floor(TC.width / ratio);
+  const cssH = TC.clientHeight || Math.floor(TC.height / ratio);
+  // Ensure canvas backing and transform are set for crisp rendering
+  TC.style.width = cssW + 'px'; TC.style.height = cssH + 'px';
+  TC.width = Math.max(1, Math.floor(cssW * ratio));
+  TC.height = Math.max(1, Math.floor(cssH * ratio));
+  tx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  tx.clearRect(0,0,cssW,cssH);
+
+  if(!gTreeLayout) {
+    tx.fillStyle='rgba(201,168,76,0.3)';
+    tx.font='italic 12px "IM Fell English",serif';
+    tx.textAlign='center'; tx.textBaseline='middle';
+    tx.fillText('Press "Solve & Play" to generate tree', cssW/2, cssH/2);
+    return;
+  }
+
+  const { pos } = gTreeLayout;
+  const nodes = gTree.nodes;
+  const solKeys = new Set(gSol ? gSol.map(s => skey(s)) : []);
+
+  // Draw Edges (with labeled moves)
+  gTree.edges.forEach(e => {
+    const fp = pos[e.f], tp = pos[e.t];
+    if(!fp || !tp) return;
+    const pNode = nodes[e.f], tNode = nodes[e.t];
+    const k = skey(tNode.state);
+    const inSol = solKeys.has(k);
+    const isPlayerPath = playerKeys.includes(k);
+
+    tx.lineCap = 'round';
+    tx.beginPath();
+    tx.moveTo(Math.round(fp.x), Math.round(fp.y));
+    tx.lineTo(Math.round(tp.x), Math.round(tp.y));
+    tx.lineWidth = isPlayerPath ? 3 : inSol ? 1.6 : 1;
+    tx.strokeStyle = isPlayerPath ? 'rgba(240,192,96,0.98)' : inSol ? 'rgba(201,168,76,0.7)' : 'rgba(255,255,255,0.09)';
+    tx.stroke();
+
+    // move label
+    const mx = Math.round((fp.x + tp.x) / 2);
+    const my = Math.round((fp.y + tp.y) / 2);
+    const dx = tp.x - fp.x, dy = tp.y - fp.y;
+    const L = Math.hypot(dx, dy) || 1;
+    const ox = Math.round(-dy / L * 10);
+    const oy = Math.round(dx / L * 10);
+    const lx = mx + ox;
+    const ly = my + oy;
+
+    const dm = Math.abs(pNode.state.lm - tNode.state.lm);
+    const dd = Math.abs(pNode.state.ld - tNode.state.ld);
+    let movesLabel = '';
+    if(dm > 0) movesLabel += `${dm}M`;
+    if(dd > 0) movesLabel += (movesLabel ? ' ' : '') + `${dd}D`;
+    const arrow = tNode.state.b === 0 ? '◀' : '▶';
+    movesLabel = movesLabel ? `${movesLabel} ${arrow}` : arrow;
+
+    tx.font = '11px "Courier Prime", monospace';
+    tx.textAlign = 'center'; tx.textBaseline = 'middle';
+    const tw = Math.ceil(tx.measureText(movesLabel).width) + 12;
+    const th = 18;
+    const rx = Math.round(lx - tw/2);
+    const ry = Math.round(ly - th/2);
+
+    tx.fillStyle = 'rgba(0,0,0,0.6)';
+    roundRect(tx, rx, ry, tw, th, 6);
+    tx.fill();
+    tx.fillStyle = 'rgba(201,168,76,1)';
+    tx.fillText(movesLabel, lx, ly);
+  });
+
+  // Draw Nodes
+  nodes.forEach(n => {
+    const p = pos[n.id]; if(!p) return;
+    const k = skey(n.state);
+    const isCur = k === skey(gState);
+    const isG = isGoal(n.state);
+    const inSol = solKeys.has(k);
+    const isPlayerPath = playerKeys.includes(k);
+
+    const s = n.state;
+    const label = `${s.lm}M ${s.ld}D ${s.b === 0 ? '◀' : '▶'}`;
+
+    tx.font = '12px "Courier Prime", monospace';
+    const textW = Math.ceil(tx.measureText(label).width);
+    const pad = 12;
+    const boxW = Math.max(44, textW + pad);
+    const boxH = 24;
+
+    const x = Math.round(p.x - boxW / 2);
+    const y = Math.round(p.y - boxH / 2);
+
+    // choose colors
+    let fillColor, textColor, borderColor;
+    if(isCur) { fillColor = '#e74c3c'; textColor = '#fff'; borderColor = 'rgba(0,0,0,0.25)'; }
+    else if(isPlayerPath) { fillColor = '#f0c060'; textColor = '#1a0b06'; borderColor = 'rgba(0,0,0,0.18)'; }
+    else if(isG) { fillColor = '#c9a84c'; textColor = '#1a0b06'; borderColor = 'rgba(0,0,0,0.18)'; }
+    else if(inSol) { fillColor = 'rgba(201,168,76,0.95)'; textColor = '#1a0b06'; borderColor = 'rgba(0,0,0,0.12)'; }
+    else { fillColor = 'rgba(255,255,255,0.06)'; textColor = '#fff'; borderColor = 'rgba(0,0,0,0.08)'; }
+
+    tx.fillStyle = fillColor;
+    roundRect(tx, x, y, boxW, boxH, 12);
+    tx.fill();
+
+    tx.lineWidth = 1; tx.strokeStyle = borderColor;
+    roundRect(tx, x + 0.5, y + 0.5, boxW, boxH, 12);
+    tx.stroke();
+
+    tx.fillStyle = textColor; tx.textAlign = 'center'; tx.textBaseline = 'middle';
+    tx.fillText(label, Math.round(p.x), Math.round(p.y));
+  });
+}
+
+// ════════════════════════════════════════════════
+// UI RENDERING
+// ════════════════════════════════════════════════
+function renderAll(){
+  renderSide();
+  renderMvGrid();
+  renderCtr();
+  drawTree(); // Triggers real-time node highlighting
+}
+
+function renderSide(){
+  const mkF=(m,d,id)=>{
+    const el=document.getElementById(id); el.innerHTML='';
+    for(let i=0;i<m;i++) el.innerHTML+=`<div class="fig monk">🧘</div>`;
+    for(let i=0;i<d;i++) el.innerHTML+=`<div class="fig demon">👹</div>`;
+    if(m+d===0) el.innerHTML=`<span style="font-size:0.6rem;opacity:0.3;font-style:italic;">empty</span>`;
+  };
+  mkF(gState.lm,gState.ld,'lfigs');
+  mkF(gState.rm,gState.rd,'rfigs');
+  const bd=document.getElementById('bdot'), bt=document.getElementById('btxt');
+  if(gState.b===0){bd.className='bdot';bt.textContent='Boat at Left';}
+  else{bd.className='bdot r';bt.textContent='Boat at Right';}
+}
+
+const MVDEF=[
+  {m:1,d:0,icon:'🧘',lbl:'1 Monk'},
+  {m:0,d:1,icon:'👹',lbl:'1 Demon'},
+  {m:2,d:0,icon:'🧘🧘',lbl:'2 Monks'},
+  {m:0,d:2,icon:'👹👹',lbl:'2 Demons'},
+  {m:1,d:1,icon:'🧘👹',lbl:'1 Each'},
+];
+
+function renderMvGrid(){
+  const g=document.getElementById('mgrid'); g.innerHTML='';
+  if(isGoal(gState)){
+    g.innerHTML=`<div style="padding:15px;text-align:center;font-style:italic;font-size:0.8rem;color:var(--gold);opacity:0.8;">✦ Puzzle Complete ✦</div>`;
+    return;
+  }
+  if(playing || isAnimating){
+    const msg = playing ? 'Autoplay running…' : 'Crossing…';
+    g.innerHTML=`<div style="padding:15px;text-align:center;font-style:italic;font-size:0.8rem;color:var(--parchment-dark);opacity:0.6;">${msg}</div>`;
+    return;
+  }
+
+  const vm=moves(gState);
+  const vmap=new Map(vm.map(v=>[`${v.m}${v.d}`,v]));
+  const dir=gState.b===0?'→':'←';
+  MVDEF.forEach(def=>{
+    const mv=vmap.get(`${def.m}${def.d}`);
+    const btn=document.createElement('button');
+    btn.className='mbtn'; if(!mv)btn.disabled=true;
+    btn.innerHTML=`<span class="mi">${def.icon}</span><span class="ml">${def.lbl}</span><span class="md">${dir}</span>`;
+    if(mv)btn.onclick=()=>applyMove(mv,null);
+    g.appendChild(btn);
+  });
+}
+
+function renderCtr(){
+  document.getElementById('mcnt').textContent=gMoves;
+  document.getElementById('ucnt').textContent=gUndos;
+  document.getElementById('undoBtn').disabled=gHist.length<=1||isAnimating||playing;
+  document.getElementById('redoBtn').disabled=gFuture.length===0||isAnimating||playing;
+}
+
+function setMsg(m,c=''){const e=document.getElementById('smsg');e.textContent=m;e.className='smsgT '+c;}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// ════════════════════════════════════════════════
+// GAME ACTIONS & ANIMATIONS
+// ════════════════════════════════════════════════
+function transitionState(newS, cb) {
+  isAnimating = true;
+  renderMvGrid(); 
+  
+  const fromBank = gState.b;
+  const toBank = newS.b;
+  
+  let mMoved = 0, dMoved = 0;
+  if (fromBank === 0) { mMoved = gState.lm - newS.lm; dMoved = gState.ld - newS.ld; } 
+  else { mMoved = gState.rm - newS.rm; dMoved = gState.rd - newS.rd; }
+  
+  const passengers = [];
+  let mCount = mMoved, dCount = dMoved;
+  chars.forEach(c => {
+    if (c.bank === fromBank && !c.onboat) {
+      if (c.type === 'monk' && mCount > 0) { passengers.push(c); mCount--; }
+      if (c.type === 'demon' && dCount > 0) { passengers.push(c); dCount--; }
+    }
+  });
+
+  passengers.forEach(c => c.onboat = true);
+  const pd = spMs(speed)/3;
+
+  setTimeout(() => {
+    boatTX = toBank === 0 ? gW() * RL + 20 : gW() * RR - 20;
+    const rx=gW()*(RL+RR)/2, ry=gy()+14;
+    for(let i=0;i<3;i++) ripples.push({x:rx+(Math.random()-.5)*50,y:ry+Math.random()*14,r:3,a:0.52});
+
+    setTimeout(() => {
+      boatX = boatTX; 
+      passengers.forEach(c => { c.onboat = false; c.bank = toBank; });
+      
+      setTimeout(() => {
+        gState = newS;
+        isAnimating = false;
+        renderAll();
+        checkWin();
+        if (cb) cb();
+      }, pd);
+    }, pd);
+  }, pd);
+}
+
+function applyMove(mv, cb){
+  if (isAnimating) return;
+  gHist.push(mv.ns); gFuture=[];
+  playerKeys.push(skey(mv.ns));
+  gMoves++;
+  renderCtr();
+  transitionState(mv.ns, cb);
+}
+
+function doUndo(){
+  if(gHist.length<=1||isAnimating||playing) return;
+  const oldS = gHist.pop(); 
+  gFuture.push(oldS);
+  const newS = gHist[gHist.length-1];
+  playerKeys.pop();
+  gMoves = Math.max(0, gMoves-1); gUndos++;
+  renderCtr(); setMsg('Move undone.');
+  transitionState(newS, null);
+}
+
+function doRedo(){
+  if(!gFuture.length||isAnimating||playing) return;
+  const newS = gFuture.pop();
+  gHist.push(newS);
+  playerKeys.push(skey(newS));
+  gMoves++;
+  renderCtr(); setMsg('Move redone.');
+  transitionState(newS, null);
+}
+
+function resetGame(keepSol){
+  stopAuto();
+  gState=mk(N,N,0,0,0); gHist=[gState]; gFuture=[];
+  gMoves=0; gUndos=0; playerKeys=[skey(gState)];
+  isAnimating = false;
+  if(!keepSol){
+    gTree=null; gSol=null; gTreeLayout=null;
+    document.getElementById('ocnt').textContent='—';
+    updateTreeLayout();
+  }
+  
+  boatTX = gW()*RL+20; boatX = boatTX;
+  chars.forEach(c => { c.bank = 0; c.onboat = false; });
+  updateCharTargets();
+  chars.forEach(c => { c.x = c.tx; c.y = c.ty; });
+
+  renderAll();
+  setMsg('Transport all monks and demons across the river.');
+}
+
+function checkWin(){
+  if(isGoal(gState)){
+    setMsg('✦ Victory! All have crossed safely. ✦','win');
+    toast('✦ The crossing is complete ✦');
+  }
+}
+
+// ════════════════════════════════════════════════
+// SOLVER & AUTOPLAY
+// ════════════════════════════════════════════════
+function pickAlgo(name){
+  algo=name;
+  document.querySelectorAll('.abtn').forEach(b=>b.classList.toggle('sel',b.dataset.a===name));
+  document.getElementById('algoLbl').textContent=name==='astar'?'A*':name.toUpperCase();
+}
+
+function runAlgo(){
+  const s=mk(N,N,0,0,0);
+  if(algo==='bfs')   return bfs(s);
+  if(algo==='dfs')   return dfs(s);
+  if(algo==='astar') return astar(s);
+  return bfs(s);
+}
+
+function solveAndPlay(){
+  const T=runAlgo();
+  gTree=T; gSol=T.sol;
+  document.getElementById('ocnt').textContent=gSol?gSol.length-1:'—';
+  updateTreeLayout();
+  
+  if(!gSol){toast('No solution found');drawTree();return;}
+  toast(`Solved in ${gSol.length-1} steps — watching crossing`);
+  
+  resetGame(true);
+  setTimeout(()=>startAuto(gSol),400);
+}
+
+function toggleAuto(){
+  if(playing){stopAuto();return;}
+  if(!gSol){solveAndPlay();return;}
+  resetGame(true);
+  setTimeout(()=>startAuto(gSol),400);
+}
+
+function startAuto(path){
+  playing=true;
+  document.getElementById('autoBtn').textContent='⏹ Stop Auto';
+  document.getElementById('autoBtn').classList.add('active');
+  playQ=[...path]; 
+  
+  if(playQ.length > 0 && skey(playQ[0]) === skey(gState)) playQ.shift();
+  
+  renderMvGrid();
+  stepAuto();
+}
+
+function stepAuto(){
+  if(!playing||!playQ.length){stopAuto();return;}
+  const nextS = playQ.shift();
+
+  gHist.push(nextS); gFuture=[];
+  playerKeys.push(skey(nextS));
+  gMoves++;
+  
+  // Realtime Tree Updates as we Autoplay
+  renderCtr();
+  drawTree();
+  
+  transitionState(nextS, () => {
+    if(isGoal(gState)){stopAuto();return;}
+    if(playing) playTimer=setTimeout(stepAuto, 100);
+  });
+}
+
+function stopAuto(){
+  playing=false; clearTimeout(playTimer);
+  document.getElementById('autoBtn').textContent='▶ Auto Play';
+  document.getElementById('autoBtn').classList.remove('active');
+  renderAll();
+}
+
+function setSpeed(v){speed=v;}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+window.addEventListener('resize', () => {
+  initSC();
+  updateTreeLayout();
+  drawTree();
+});
+
+initSC(); 
+updateTreeLayout();
+renderAll();
+requestAnimationFrame(frame);
+</script>
+<script>
+// Runtime check for local fonts and graceful fallback
+(function(){
+  const fonts = [
+    {name:'Cinzel',file:'./fonts/Cinzel.woff2'},
+    {name:'Cinzel Decorative',file:'./fonts/CinzelDecorative.woff2'},
+    {name:'IM Fell English',file:'./fonts/IMFellEnglish.woff2'},
+    {name:'Courier Prime',file:'./fonts/CourierPrime.woff2'}
+  ];
+  // If FontFace is supported, attempt to load; otherwise rely on CSS fallback
+  if(window.FontFace){
+    fonts.forEach(f=>{
+      fetch(f.file).then(r=>{
+        if(!r.ok) throw new Error('not found');
+        return r.arrayBuffer();
+      }).then(buf=>{
+        // try to construct a FontFace to ensure file is valid
+        try{
+          const ff=new FontFace(f.name, buf);
+          document.fonts.add(ff);
+        }catch(e){
+          console.warn('Font load failed', f.name, e);
+        }
+      }).catch(()=>{
+        console.warn('Local font not found, using fallbacks:', f.file);
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
